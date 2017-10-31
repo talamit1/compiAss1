@@ -1,6 +1,9 @@
-(load "pc.scm")
 
-(define <sexpr>
+  tal
+
+
+  roy
+  tal
 	yossi
 	shimon
 
