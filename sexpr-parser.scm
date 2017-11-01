@@ -62,6 +62,8 @@
 		))
 
 
+(define a 5)
+
 
 
  (test-string <integer> "-4")
