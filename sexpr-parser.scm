@@ -129,8 +129,6 @@
 	)
 )
 
-<<<<<<< HEAD
-=======
 (define <CharPrefix>
 	(caten (char #\#) (char #\\))
 )
@@ -145,7 +143,6 @@
 )
 
 
->>>>>>> 4a212e0f755c1276de14d63386747c79fb24ad47
 
 	
 ;(test-string <boolean> "#t")
