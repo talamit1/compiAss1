@@ -36,12 +36,18 @@
 			))
 
 
+(define intToRet
+	(lambda (sign int)
+		(string->number (string-append sign (number->string int)))
+		)
+)
 
 (define <integer>
 	(new 
 		 (*parser <plus>)
 		  (*parser <nat>) 
 		  (*caten 2)
+		  (*pack-with intToRet)
 
 		  (*parser <minus>)
 		  (*parser <nat>) 
@@ -50,10 +56,10 @@
 		  (*parser <nat>)
 
 		  (*disj 3)
-		  (*pack toPrint)
-
-		done)
+		   done
 	)
+
+
 
 (define toPrint 
 	(lambda (e) 
@@ -85,4 +91,5 @@
  (test-string <nat> "4")
  (test-string <integer> "4")
  (test-string <fraction> "4")
+=======
 
