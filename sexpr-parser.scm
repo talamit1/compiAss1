@@ -42,6 +42,30 @@
 		)
 )
 
+
+(define append2
+	(lambda (st1 st2 )
+		(string-append (string st1) (string st2)))
+	)
+
+
+(define <boolean>
+	(new
+		(*parser (char-ci #\#))
+		(*parser (char-ci #\t))
+		(*caten 2)
+		(*pack-with append2)
+		
+		(*parser (char-ci #\#))
+		(*parser (char-ci #\f))
+		(*caten 2)
+		(*pack-with append2)
+	
+
+		(*disj 2)
+	done)
+)
+
 (define <integer>
 	(new 
 		 (*parser <plus>)
@@ -96,8 +120,6 @@
 	
 	(caten (char #\x) (star <HexChar> )  )
 	
-	
-
 )
 
 (define <VisibleSimpleChar>
@@ -106,7 +128,11 @@
 		)
 	)
 )
+
+
 	
+;(test-string <boolean> "#t")
+
 
 
 
