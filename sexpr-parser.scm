@@ -92,12 +92,16 @@
 )
 
 (define <HexUnicodeChar>
+	
 	(caten (char #\x) (star <HexChar> )  )
+	
+	
+
 )
 
-(define <visibleSimpleChar>
-	(const (lambda (vh)  
-		(char<=? 32 ch)
+(define <VisibleSimpleChar>
+	(const (lambda (ch)  
+		(char<=? #\  ch)
 		)
 	)
 )
