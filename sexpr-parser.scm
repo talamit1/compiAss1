@@ -59,7 +59,8 @@
 
 		  (*disj 3)
 		   done
-	))
+	)
+)
 
 (define <fraction>
 	(new
@@ -85,13 +86,30 @@
 				))    
 
 		done))
-		
-				
-		
- ;(test-string <nat> "4")
- ;(test-string <integer> "-4")
- ;(test-string <fraction> "4/9")
-			
+
+
+(define <HexChar>
+		(disj <digit0-9> (range #\a #\f) )
+)
+
+(define <HexUnicodeChar>
+	
+	(caten (char #\x) (star <HexChar> )  )
+	
+	
+
+)
+
+(define <VisibleSimpleChar>
+	(const (lambda (ch)  
+		(char<=? #\  ch)
+		)
+	)
+)
+	
+
+
+
 
 
 
