@@ -52,44 +52,47 @@
 		  (*parser <minus>)
 		  (*parser <nat>) 
 		  (*caten 2)
+		  (*pack-with intToRet)
+
 
 		  (*parser <nat>)
 
 		  (*disj 3)
 		   done
-	)
-
-
-
-(define toPrint 
-	(lambda (e) 
-		(if (pair? e) (list->string (cons (car e) (cadr e)))
-			e
-		)
-))
-
+	))
 
 (define <fraction>
 	(new
 		(*parser <integer>)
-		(*parser (char #\\))
+		(*parser (char #\/))
 		(*pack 
 			(lambda (ch)
 				(string ch)))
+		
+		;(pack
+		;	(char #\/)
+		;	(lambda (ch) ( string ch))
+		;	   )
+
 		(*parser <nat>)
 		
 		(*caten 3)
 		
 		(*pack-with
-			(lambda (x y z)
-				(string->number(list->string '(,x y ,z)))))
+			(lambda (int ch nat)
+				(string->number (string-append (string-append (number->string int) ch) (number->string nat)))
+				
+				))    
 
 		done))
 		
 				
 		
- (test-string <nat> "4")
- (test-string <integer> "4")
- (test-string <fraction> "4")
-=======
+ ;(test-string <nat> "4")
+ ;(test-string <integer> "-4")
+ ;(test-string <fraction> "4/9")
+			
+
+
+
 
