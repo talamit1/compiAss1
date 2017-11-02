@@ -36,6 +36,7 @@
 			))
 
 
+
 (define <integer>
 	(new 
 		 (*parser <plus>)
@@ -59,11 +60,29 @@
 		(if (pair? e) (list->string (cons (car e) (cadr e)))
 			e
 		)
-		))
+))
 
 
-(define a 5)
+(define <fraction>
+	(new
+		(*parser <integer>)
+		(*parser (char #\\))
+		(*pack 
+			(lambda (ch)
+				(string ch)))
+		(*parser <nat>)
+		
+		(*caten 3)
+		
+		(*pack-with
+			(lambda (x y z)
+				(string->number(list->string '(,x y ,z)))))
 
+		done))
+		
+				
+		
+ (test-string <nat> "4")
+ (test-string <integer> "4")
+ (test-string <fraction> "4")
 
-
- (test-string <integer> "-4")
