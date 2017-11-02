@@ -60,6 +60,47 @@
 		   done
 	)
 )
+
+(define <fraction>
+	(new
+		(*parser <integer>)
+		(*parser (char #\/))
+		(*pack 
+			(lambda (ch)
+				(string ch)))
+		
+		;(pack
+		;	(char #\/)
+		;	(lambda (ch) ( string ch))
+		;	   )
+
+		(*parser <nat>)
+		
+		(*caten 3)
+		
+		(*pack-with
+			(lambda (int ch nat)
+				(string->number (string-append (string-append (number->string int) ch) (number->string nat)))
+				
+				))    
+
+		done))
+
+
+(define <HexChar>
+		(disj <digit0-9> (range #\a #\f))
+)
+
+(define <HexUnicodeChar>
+	(caten (cahr '#\x') (star <HexChar>)  )
+)
+
+(define <visibleSimpleChar>
+	(const (lambda (vh)  
+		(char<=? 32 ch)
+		)
+	)
+)
 	
 
 
