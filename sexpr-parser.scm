@@ -88,11 +88,11 @@
 
 
 (define <HexChar>
-		(disj <digit0-9> (range #\a #\f))
+		(disj <digit0-9> (range #\a #\f) )
 )
 
 (define <HexUnicodeChar>
-	(caten (cahr '#\x') (star <HexChar>)  )
+	(caten (char #\x) (star <HexChar> )  )
 )
 
 (define <visibleSimpleChar>
