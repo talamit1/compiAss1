@@ -36,34 +36,35 @@
 			))
 
 
+(define intToRet
+	(lambda (sign int)
+		(string->number (string-append sign (number->string int)))
+		)
+)
+
 (define <integer>
 	(new 
 		 (*parser <plus>)
 		  (*parser <nat>) 
 		  (*caten 2)
+		  (*pack-with intToRet)
 
 		  (*parser <minus>)
 		  (*parser <nat>) 
 		  (*caten 2)
+		  (*pack-with intToRet)
 
 		  (*parser <nat>)
 
 		  (*disj 3)
-		  (*pack toPrint)
-
-		done)
+		   done
 	)
-
-(define toPrint 
-	(lambda (e) 
-		(if (pair? e) (list->string (cons (car e) (cadr e)))
-			e
-		)
-		))
-
-
-(define a 5)
+)
+	
 
 
 
- (test-string <integer> "-4")
+
+
+
+
