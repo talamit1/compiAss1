@@ -113,12 +113,12 @@
 
 
 (define <HexChar>
-		(disj <digit0-9> (range #\a #\f) )
+		(disj <digit0-9> (range-ci #\a #\f) )
 )
 
 (define <HexUnicodeChar>
 	
-	(caten (char #\x) (star <HexChar> )  )
+	(caten (char-ci #\x) (star <HexChar> )  )
 	
 )
 
@@ -129,6 +129,23 @@
 	)
 )
 
+<<<<<<< HEAD
+=======
+(define <CharPrefix>
+	(caten (char #\#) (char #\\))
+)
+
+(define <Char>
+	(new 
+		(*parser <CharPrefix>)
+		(*parser (disj   <HexUnicodeChar> <VisibleSimpleChar> ) )
+		(*caten 2)
+		done
+   	)
+)
+
+
+>>>>>>> 4a212e0f755c1276de14d63386747c79fb24ad47
 
 	
 ;(test-string <boolean> "#t")
