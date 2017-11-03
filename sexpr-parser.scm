@@ -167,10 +167,25 @@
    	)
 )
 
+(define <InfixPrefixExtensionPrefix>
+	(new 
+		(*parser (word "##"))
+		(*parser (word "#%"))
+		(*disj 2)
+	done)	
+)
 
-
-
-
+(define InfixSymbol
+	(new 
+		(*parser (char "#\+"))
+		(*parser (char "#\-"))
+		(*parser (char "#\*"))
+		(*parser (char "#\/"))
+		(*parser (char "#\^"))
+		(*parser (word "**"))
+		(*disj 6)
+	done)
+)
 
 	
 ;(test-string <boolean> "#t")
