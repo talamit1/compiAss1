@@ -126,18 +126,43 @@
 )
 
 (define <CharPrefix>
-	(caten (char #\#) (char #\\))
+	(word "#\\")
 )
 
+(define buildNamed 
+	(lambda (str ch)
+		(pack
+			(word-ci str) 
+			(lambda (_) ch)
+		)	
+	)
+)
 
+(define <NamedChar>
+	(new
+		(*parser (buildNamed "lambda" (integer->char 955)))
+		(*parser (buildNamed "nul" #\nul ))
+		(*parser (buildNamed "tab" #\tab ))
+		(*parser (buildNamed "newline" #\newline ))
+		(*parser (buildNamed "return" #\return ))
+		(*parser (buildNamed "page" #\page))
+		(*parser (buildNamed "space" #\space))
+		(*disj 7)
+		done)	
+)
 
 
 
 (define <Char>
 	(new 
 		(*parser <CharPrefix>)
-		(*parser (disj   <HexUnicodeChar> <VisibleSimpleChar> ) )
+		(*parser <HexUnicodeChar>)
+		(*parser <NamedChar>)
+		(*parser <VisibleSimpleChar>)
+		(*disj 3)
 		(*caten 2)
+		(*pack-with
+			(lambda(charPref ch) ch))
 		done
    	)
 )
