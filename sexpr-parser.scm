@@ -24,6 +24,8 @@
        	(lambda (resList) (string->number (list->string (cons (car resList) (cadr resList)))) )
        )
        done))
+
+
 (define <plus>
 	(pack
 		 (char #\+)
@@ -90,26 +92,16 @@
 	(new
 		(*parser <integer>)
 		(*parser (char #\/))
-		(*pack 
-			(lambda (ch)
-				(string ch)))
-		
-		;(pack
-		;	(char #\/)
-		;	(lambda (ch) ( string ch))
-		;	   )
-
 		(*parser <nat>)
-		
 		(*caten 3)
 		
 		(*pack-with
 			(lambda (int ch nat)
-				(string->number (string-append (string-append (number->string int) ch) (number->string nat)))
-				
-				))    
+				( / int nat))
+		)    
 
-		done))
+		done)
+)
 
 
 (define <HexChar>
@@ -117,8 +109,12 @@
 )
 
 (define <HexUnicodeChar>
-	
-	(caten (char-ci #\x) (star <HexChar> )  )
+	(pack-with
+	(caten (char-ci #\x) (plus <HexChar> ) )
+	(lambda (x num)
+		(integer->char (string->number (list->string num) 16) )
+		)
+	)
 	
 )
 
@@ -133,6 +129,10 @@
 	(caten (char #\#) (char #\\))
 )
 
+
+
+
+
 (define <Char>
 	(new 
 		(*parser <CharPrefix>)
@@ -144,11 +144,15 @@
 
 
 
+
+
+
 	
 ;(test-string <boolean> "#t")
 
-
-
+(test-string <Char> "#t");
+(test-string <Char> "#\\t");
+(test-string <Char> "#\\x64")
 
 
 
