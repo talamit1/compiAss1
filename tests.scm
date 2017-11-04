@@ -422,7 +422,7 @@
 (newline)
 |#
 
-#|
+
 ;; <Symbol> tests
 (newline)
 (display "=========================================================================")
@@ -434,118 +434,118 @@
 
 (display "> (test-string <sexpr> \"a\")")
 (newline)
-(run-test (test-string <sexpr> "a") '((match a) (remaining "")))
+(run-test (test-string <symbol> "a") '((match a) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"A\")")
 (newline)
-(run-test (test-string <sexpr> "A") '((match a) (remaining "")))
+(run-test (test-string <symbol> "A") '((match a) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"8\")")
 (newline)
-(run-test (test-string <sexpr> "8") '((match 8) (remaining "")))
+(run-test (test-string <symbol> "8") '((match 8) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"!\")")
 (newline)
-(run-test (test-string <sexpr> "!") '((match !) (remaining "")))
+(run-test (test-string <symbol> "!") '((match !) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"$\")")
 (newline)
-(run-test (test-string <sexpr> "$") '((match $) (remaining "")))
+(run-test (test-string <symbol> "$") '((match $) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"^\")")
 (newline)
-(run-test (test-string <sexpr> "^") '((match ^) (remaining "")))
+(run-test (test-string <symbol> "^") '((match ^) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"*\")")
 (newline)
-(run-test (test-string <sexpr> "*") '((match *) (remaining "")))
+(run-test (test-string <symbol> "*") '((match *) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"-\")")
 (newline)
-(run-test (test-string <sexpr> "-") '((match -) (remaining "")))
+(run-test (test-string <symbol> "-") '((match -) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"_\")")
 (newline)
-(run-test (test-string <sexpr> "_") '((match _) (remaining "")))
+(run-test (test-string <symbol> "_") '((match _) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"=\")")
 (newline)
-(run-test (test-string <sexpr> "=") '((match =) (remaining "")))
+(run-test (test-string <symbol> "=") '((match =) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"+\")")
 (newline)
-(run-test (test-string <sexpr> "+") '((match +) (remaining "")))
+(run-test (test-string <symbol> "+") '((match +) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"<\")")
 (newline)
-(run-test (test-string <sexpr> "<") '((match <) (remaining "")))
+(run-test (test-string <symbol> "<") '((match <) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \">\")")
 (newline)
-(run-test (test-string <sexpr> ">") '((match >) (remaining "")))
+(run-test (test-string <symbol> ">") '((match >) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"?\")")
 (newline)
-(run-test (test-string <sexpr> "?") '((match ?) (remaining "")))
+(run-test (test-string <symbol> "?") '((match ?) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"/\")")
 (newline)
-(run-test (test-string <sexpr> "/") '((match /) (remaining "")))
+(run-test (test-string <symbol> "/") '((match /) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"num\")")
 (newline)
-(run-test (test-string <sexpr> "num") '((match num) (remaining "")))
+(run-test (test-string <symbol> "num") '((match num) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"nAn1\")")
 (newline)
-(run-test (test-string <sexpr> "nAn1") '((match nan1) (remaining "")))
+(run-test (test-string <symbol> "nAn1") '((match nan1) (remaining "")))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"2fast2furious\")")
 (newline)
-(run-test (test-string <sexpr> "2fast2furious") '((match 2fast2furious) (remaining ""))) ;; Actual printout: ((match \x32;fast2furious (remaining ""))
+(run-test (test-string <symbol> "2fast2furious") '((match 2fast2furious) (remaining ""))) ;; Actual printout: ((match \x32;fast2furious (remaining ""))
 (newline)
 (newline)
 
 (display "> (test-string <sexpr> \"!<anseiD0rifto\")")
 (newline)
-(run-test (test-string <sexpr> "!<anseiD0rifto") '((match !<anseid0rifto) (remaining "")))
+(run-test (test-string <symbol> "!<anseiD0rifto") '((match !<anseid0rifto) (remaining "")))
 (newline)
 (newline)
-|#
+
 
 #|
 ;; <ProperList> tests

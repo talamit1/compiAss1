@@ -178,7 +178,12 @@
 (define <SymbolChar>
 	(new
 		(*parser <digit0-9>)
-		(*parser (range-ci #\a #\z))
+		(*parser (range #\a #\z))
+		(*parser (range #\A #\Z))
+		(*pack 
+		(lambda (ch)
+			(integer->char (+ (char->integer ch) 32))))
+
 		(*parser (char #\!))
 		(*parser (char #\$))
 		(*parser (char #\^))
@@ -191,7 +196,7 @@
 		(*parser (char #\<))
 		(*parser (char #\?))
 		(*parser (char #\/))
-		(*disj 14)
+		(*disj 15)
 
 	done)
 	)
@@ -199,7 +204,7 @@
 
 (define <symbol>	
 	(new
-		(*parser <SymbolChar>) *star
+		(*parser <SymbolChar>) *plus
 	
 		(*pack
 			(lambda (cha)
@@ -278,7 +283,7 @@ done)
 		(*caten 3)
 
 		(*pack-with
-			(lambda(opem string close) 
+			(lambda(open string close) 
 				(list->string string)))
 
 	done)
@@ -286,6 +291,81 @@ done)
 )
 
 
+(define <ProperList>
+
+	(new
+		(*parser (char #\( ))
+		(*delayed (lambda() <sexpr>)) *star
+		(*parser (char #\) ))
+		(*caten 3)
+		(*pack-with
+			(lambda (pern1 sexp pern2) sexp ))
+
+	done)
+
+)
+
+(define <ImproperList>
+	(new
+		(*parser (char #\( ))
+		(*delayed (lambda() <sexpr>)) *plus
+		(*parser (char #\. ))
+		(*delayed (lambda() <sexpr>))
+		(*parser (char #\) ))
+		(*caten 5)
+		(*pack-with 
+			(lambda (pern1 sexplst dot sexp pern2) (append sexplst sexp)))
+
+	done)
+
+)
+
+(define <Vector>
+	(new
+		(*parser (char #\# ))
+		(*parser <ProperList>)
+		(*caten 2)
+		(*pack-with
+		(lambda (pre vec) vec))
+
+	done)
+
+)
+
+;catenate quote, unquote and quasiquote to <sexpr> 
+(define catenPreSexp
+	(lambda (pre str)
+	(new
+		(*parser (char pre))
+		(*parser <sexpr>)
+		(*caten 2)
+	(*pack-with
+		(lambda (pref sx) (list str sx)))
+	done) 
+	)
+)
+
+
+(define <Quoted>	
+		(catenPre #\' 'quote)
+)
+(define <QuasiQuoted>
+	(catenPre #\` 'quasiquote)
+)
+(define <Unquoted>
+	(catenPre #\, 'unquote)
+)
+
+
+(define <UnquoteAndSpliced>
+  (new 
+  	  (*parser (word ",@"))
+      (*parser <sexpr>)
+      (*caten 2)
+    (*pack-with
+        (lambda (pref sx) (list 'unquote-splicing sx)))
+done)
+)
 
 (define <InfixExpression>
 	(new 
