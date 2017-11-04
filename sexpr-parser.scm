@@ -347,13 +347,13 @@ done)
 
 
 (define <Quoted>	
-		(catenPre #\' 'quote)
+		(catenPreSexp #\' 'quote)
 )
 (define <QuasiQuoted>
-	(catenPre #\` 'quasiquote)
+	(catenPreSexp #\` 'quasiquote)
 )
 (define <Unquoted>
-	(catenPre #\, 'unquote)
+	(catenPreSexp #\, 'unquote)
 )
 
 
@@ -467,10 +467,9 @@ done)
 		(*parser (word ")" ))
 		(*caten 3)
 		
-		(*pack-with 
-			(lambda (opePar arg closPar)
-					`(,@(flatten arg))
-			))
+		(*pack-with
+			(lambda (pr1 args pr2)
+			  (lambda (fun) `(,fun ,@args))))
 	done)
 )
 
@@ -565,11 +564,12 @@ done)
 		(*disj 2)
 		*star
 		(*caten 2)	
-		(*pack-with
-			(lambda (first rest)
-				`(,first ,@rest)
-			)
-		)
+			(*pack-with
+				(lambda (first rest)
+				  (fold-left
+					(lambda (a x) (x a))
+					first
+					rest)))
 
 	done)	
 )
