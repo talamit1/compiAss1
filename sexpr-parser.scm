@@ -178,7 +178,12 @@
 (define <SymbolChar>
 	(new
 		(*parser <digit0-9>)
-		(*parser (range-ci #\a #\z))
+		(*parser (range #\a #\z))
+		(*parser (range #\A #\Z))
+		(*pack 
+		(lambda (ch)
+			(integer->char (+ (char->integer ch) 32))))
+
 		(*parser (char #\!))
 		(*parser (char #\$))
 		(*parser (char #\^))
@@ -191,7 +196,7 @@
 		(*parser (char #\<))
 		(*parser (char #\?))
 		(*parser (char #\/))
-		(*disj 14)
+		(*disj 15)
 
 	done)
 	)
