@@ -104,6 +104,11 @@
 )
 
 
+(define <Number>
+	(disj <fraction> <integer>)	
+)
+
+
 (define <HexChar>
 		(disj <digit0-9> (range-ci #\a #\f) )
 )
@@ -167,25 +172,7 @@
    	)
 )
 
-(define <InfixPrefixExtensionPrefix>
-	(new 
-		(*parser (word "##"))
-		(*parser (word "#%"))
-		(*disj 2)
-	done)	
-)
 
-(define InfixSymbol
-	(new 
-		(*parser (char "#\+"))
-		(*parser (char "#\-"))
-		(*parser (char "#\*"))
-		(*parser (char "#\/"))
-		(*parser (char "#\^"))
-		(*parser (word "**"))
-		(*disj 6)
-	done)
-)
 
 	
 ;(test-string <boolean> "#t")
