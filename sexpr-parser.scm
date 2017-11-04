@@ -103,6 +103,10 @@
 		done)
 )
 
+(define <Number>
+		(disj <fraction> <integer>)
+)
+
 
 (define <HexChar>
 		(disj <digit0-9> (range-ci #\a #\f) )
@@ -167,6 +171,8 @@
    	)
 )
 
+
+
 (define <InfixPrefixExtensionPrefix>
 	(new 
 		(*parser (word "##"))
@@ -175,26 +181,119 @@
 	done)	
 )
 
-(define InfixSymbol
-	(new 
-		(*parser (char "#\+"))
-		(*parser (char "#\-"))
-		(*parser (char "#\*"))
-		(*parser (char "#\/"))
-		(*parser (char "#\^"))
-		(*parser (word "**"))
-		(*disj 6)
+(define <mulOrDiv>
+	(new
+		(*parser (char #\*))
+		(*pack (lambda(_) '*))
+		(*parser (char #\/))
+		(*pack (lambda(_) '/))
+		(*disj 2)
 	done)
 )
+
+
+(define <pow>
+	(new
+		(*parser (word "**"))
+		(*pack (lambda(_) '**))
+		(*parser (char #\^))
+		(*pack (lambda(_) '^))
+		(*disj 2)
+	done)
+)
+
+(define <subOrAdd>
+	(new
+		(*parser (char #\+))
+		(*pack (lambda(_) '+))
+		(*parser (char #\-))
+		(*pack (lambda(_) '-))
+		(*disj 2)
+	done)		
+)
+
+
+(define buildInfixOP
+	(lambda (<higherPriorityParser> <op>)
+		(new
+			(*delayed (lambda ()  <higherPriorityParser> ))
+			(*parser <op>)
+			(*delayed (lambda ()  <higherPriorityParser> ))
+			(*caten 2)
+				(*pack-with
+				(lambda (sign rest)
+				   (lambda (first)
+					 `(,sign ,first ,rest)
+				   )))
+			*star
+			(*caten 2)
+			(*pack-with (lambda (first lambda_rest)
+            (fold-left (lambda (op elem)
+                            (elem op)) first lambda_rest)
+          ))
+
+		done)
+	)
+)
+
+
+
+
+
+(define <InfixPow>
+	(buildInfixOP <Number> <pow>)
+)
+
+(define <InfixMulOrDiv>
+	( buildInfixOP  <InfixPow> <mulOrDiv>)
+)
+
+(define <InfixAddOrSub>
+	( buildInfixOP <InfixMulOrDiv> <subOrAdd>)
+)
+
+
+
+(define <InfixSymbol>
+	(new 
+		;;(*parser <Symbol>)
+		(*parser (char #\+))
+		(*parser (char #\-))
+		(*parser (char #\* ))
+		(*parser (char #\/) )
+		(*parser (char #\^ ))
+		(*parser (word "**" ))
+		(*disj 6)
+		;;(*diff)
+	done)
+)
+
+
+
+
+
+
+; ;;<infixBrack>::=(<infixExpression>)
+; (define <infixParen>
+; 	(new 
+; 		(*parser (char "("))
+; 		(*parser <infixExpression>)
+; 		(*parser (char ")"))
+; 		(*caten 3)
+; 		(*pack-with 
+; 			(lambda (par1 expression par2)
+; 							expression))
+; 	done)
+; 	)
+
+
 
 	
 ;(test-string <boolean> "#t")
 
-(test-string <Char> "#t");
-(test-string <Char> "#\\t");
-(test-string <Char> "#\\x64")
-
-
+; (test-string <Char> "#t");
+; (test-string <Char> "#\\t");
+; (test-string <Char> "#\\x64")
 
 
 
