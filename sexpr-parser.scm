@@ -342,9 +342,9 @@ done)
 				   )))
 			*star
 			(*caten 2)
-			(*pack-with (lambda (first lambda_rest)
+			(*pack-with (lambda (first restLambd)
             (fold-left (lambda (op elem)
-                            (elem op)) first lambda_rest)
+                            (elem op)) first restLambd)
           ))
 
 		done)
