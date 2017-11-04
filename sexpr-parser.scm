@@ -228,7 +228,7 @@
 	)
 )
 
-(test-string <stringHexChar> "\\x61;") ;((match #\a) (remaining ""))
+;(test-string <stringHexChar> "\\x61;") ;((match #\a) (remaining ""))
 
 
 (define <StringMetaChar>
@@ -300,9 +300,7 @@ done)
 		(*caten 3)
 		(*pack-with
 			(lambda (pern1 sexp pern2) sexp ))
-
 	done)
-
 )
 
 (define <ImproperList>
@@ -315,9 +313,7 @@ done)
 		(*caten 5)
 		(*pack-with 
 			(lambda (pern1 sexplst dot sexp pern2) (append sexplst sexp)))
-
 	done)
-
 )
 
 (define <Vector>
@@ -327,9 +323,7 @@ done)
 		(*caten 2)
 		(*pack-with
 		(lambda (pre vec) vec))
-
 	done)
-
 )
 
 ;catenate quote, unquote and quasiquote to <sexpr> 
@@ -372,6 +366,41 @@ done)
 		(*delayed (lambda () <InfixAddOrSub>) )
 	done)
 )
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Call by Name ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define <CBNameSyntax1>
+	(new
+		(*parser (char #\@))
+		(*parser <sexpr>)
+		(*caten 2)
+		(*pack-with
+			(lambda (pref sx) (list 'cbname sx)))
+	done)
+)
+
+(define <CBNameSyntax2>
+	(new
+		(*parser (char #\{ ))
+		(*parser <sexpr>)
+		(*parser (char #\} ))
+		(*caten 3)
+		(*pack-with
+			(lambda (prefCurli1 sx prefCurli2) (list 'cbname sx)))
+	done)
+)
+
+(define <CBName>
+	(new
+		(*parser <CBNameSyntax1>)
+		(*parser <CBNameSyntax2>)
+		(*disj 2)
+	done)
+)
+
+;(test-string <CBName> "@4")
 
 
 (define <InfixPrefixExtensionPrefix>
@@ -602,7 +631,7 @@ done)
 
 
 
-(test-string <string> "\"\\x61;\\x63;\"")
+;(test-string <string> "\"\\x61;\\x63;\"")
 
 ;(test-string <SymbolChar> "1234abcd")
 ;(test-string <SymbolChar> "%33356")
@@ -612,7 +641,7 @@ done)
 ;(test-string <stringHexChar> "#\\x23")
 
 ;(test-string <Char> "#\\x64")
-
+;(test-string <InfixAddOrSub> "1+1")
 
 
 
