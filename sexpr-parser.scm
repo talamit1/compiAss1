@@ -287,6 +287,12 @@ done)
 
 
 
+(define <InfixExpression>
+	(new 
+		(*delayed (lambda () <InfixAddOrSub>) )
+	done)
+)
+
 
 (define <InfixPrefixExtensionPrefix>
 	(new 
@@ -295,6 +301,116 @@ done)
 		(*disj 2)
 	done)	
 )
+
+
+(define <InfixSymbol>
+	(new 
+		(*parser <symbol>)
+		(*parser (char #\+))
+		(*parser (char #\-))
+		(*parser (char #\* ))
+		(*parser (char #\/) )
+		(*parser (char #\^ ))
+		(*parser (word "**" ))
+		(*disj 6)
+		*diff
+	done)
+)
+
+
+
+
+(define <InfixSexprEscape>
+	(new (*parser <InfixPrefixExtensionPrefix>)
+		(*parser <sexpr>)
+		(*caten 2)
+		(*pack-with (lambda (pref sexpr) sexpr))
+	done)
+)
+
+
+
+
+(define <InfixParen> 
+	(new
+		(*parser (char #\( ))
+		(*parser <InfixExpression>)
+		(*parser (char #\) ))
+		(*caten 3)
+		(*pack-with
+			(lambda (openPar expr closePar)
+				expr
+			))
+	done)
+)
+
+(define <InfixNeg>
+	(new
+		(*parser #\-)
+		(*parser <InfixExpression>)
+		(*caten 2)
+		(*pack-with (lambda (sign expression) (list `- expression))	)
+	done)	
+)
+
+
+
+(define <InfixArgList>
+	(new
+		(*parser <InfixExpression>)
+		
+		(*parser (char #\,))
+		(*parser <InfixExpression>)
+		(*caten 2)
+		(*pack-with (lambda (sep exp) exp))
+		*star
+		(*caten 2)
+		(*pack-with cons)
+		(*parser <epsilon>)
+		(*disj 2)
+		
+	done)
+
+)
+
+(define (flatten x)
+(cond ((null? x) '())
+	  ((pair? x) (append (flatten (car x)) (flatten (cdr x))))
+	  (else (list x))))
+
+
+
+(define <InfixFuncCall>
+	(new
+		(*parser (word "(" ))
+		(*parser <InfixArgList>)
+		(*parser (word ")" ))
+		(*caten 3)
+		
+		(*pack-with 
+			(lambda (opePar arg closPar)
+					`(,@(flatten arg))
+			))
+	done)
+)
+
+(define <InfixArrayGet>
+	(new
+		(*parser (char #\[))
+		(*parser <InfixExpression>)
+		(*parser (char #\]))
+		(*caten 3)
+		(*pack-with 
+			(lambda (arr openBR exp closeBR) `(vector-ref ,arr ,exp))
+		)
+	done)
+)
+
+
+
+
+
+
 
 (define <mulOrDiv>
 	(new
@@ -331,32 +447,64 @@ done)
 (define buildInfixOP
 	(lambda (<higherPriorityParser> <op>)
 		(new
-			(*delayed (lambda ()  <higherPriorityParser> ))
+			(*parser <higherPriorityParser> )
 			(*parser <op>)
-			(*delayed (lambda ()  <higherPriorityParser> ))
+			(*parser   <higherPriorityParser> )
 			(*caten 2)
-				(*pack-with
-				(lambda (sign rest)
-				   (lambda (first)
-					 `(,sign ,first ,rest)
-				   )))
 			*star
 			(*caten 2)
-			(*pack-with (lambda (first restLambd)
-            (fold-left (lambda (op elem)
-                            (elem op)) first restLambd)
-          ))
+			(*pack-with
+				(lambda (first rest)
+				  (fold-left
+					(lambda (a x) `(,(car x) ,a ,@(cdr x)))
+					first
+					rest
+				  )))
 
 		done)
 	)
+)
+
+(define <basicValuesParser>
+	(new
+		(*parser <Char>)
+		(*parser <Number>)
+		(*parser <InfixSymbol>)
+		(*parser <InfixParen>)
+		(*parser <InfixSexprEscape>)
+		(*parser <InfixNeg>)
+		(*disj 6)	
+	done)	
+)
+
+(define <FuncAndArraysParser>
+	(new
+		(*parser <basicValuesParser>)
+		(*parser <InfixFuncCall>)
+		(*parser <InfixArrayGet>)
+		(*disj 2)
+		*star
+		(*caten 2)	
+		(*pack-with
+			(lambda (first rest)
+				`(,first ,@rest)
+			)
+		)
+
+	done)	
 )
 
 
 
 
 
+
+
+
 (define <InfixPow>
-	(buildInfixOP <Number> <pow>)
+	(buildInfixOP <FuncAndArraysParser> <pow>)
+	
+	
 )
 
 (define <InfixMulOrDiv>
@@ -368,20 +516,6 @@ done)
 )
 
 
-
-(define <InfixSymbol>
-	(new 
-		;;(*parser <Symbol>)
-		(*parser (char #\+))
-		(*parser (char #\-))
-		(*parser (char #\* ))
-		(*parser (char #\/) )
-		(*parser (char #\^ ))
-		(*parser (word "**" ))
-		(*disj 6)
-		;;(*diff)
-	done)
-)
 
 
 
