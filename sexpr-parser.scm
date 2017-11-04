@@ -204,7 +204,7 @@
 
 (define <symbol>	
 	(new
-		(*parser <SymbolChar>) *star
+		(*parser <SymbolChar>) *plus
 	
 		(*pack
 			(lambda (cha)
