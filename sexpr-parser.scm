@@ -25,7 +25,6 @@
        )
        done))
 
-
 (define <plus>
 	(pack
 		 (char #\+)
@@ -67,6 +66,8 @@
 		(*disj 2)
 	done)
 )
+
+;(test-string <Char> "#\\t");
 
 (define <integer>
 	(new 
@@ -174,12 +175,229 @@
 
 
 
-	
-;(test-string <boolean> "#t")
+(define <SymbolChar>
+	(new
+		(*parser <digit0-9>)
+		(*parser (range-ci #\a #\z))
+		(*parser (char #\!))
+		(*parser (char #\$))
+		(*parser (char #\^))
+		(*parser (char #\*))
+		(*parser (char #\-))
+		(*parser (char #\_))
+		(*parser (char #\=))
+		(*parser (char #\+))
+		(*parser (char #\>))
+		(*parser (char #\<))
+		(*parser (char #\?))
+		(*parser (char #\/))
+		(*disj 14)
 
-(test-string <Char> "#t");
-(test-string <Char> "#\\t");
-(test-string <Char> "#\\x64")
+	done)
+	)
+
+
+(define <symbol>	
+	(new
+		(*parser <SymbolChar>) *star
+	
+		(*pack
+			(lambda (cha)
+				(string->symbol (list->string cha )))
+		)
+	done
+	)
+)
+
+
+(define <stringHexChar>
+	(new
+		(*parser (char #\\))
+		(*parser <HexUnicodeChar>)
+		(*parser (char #\;))
+		(*caten 3)
+
+		(*pack-with
+			(lambda(strHex str semi) str))
+	done
+	)
+)
+
+(test-string <stringHexChar> "\\x61;") ;((match #\a) (remaining ""))
+
+
+(define <StringMetaChar>
+
+	(new
+	(*parser (word-ci "\\\\"))
+		(*pack (lambda (_) #\\))
+	(*parser (word-ci "\\\""))
+		(*pack (lambda (_) #\"))
+	(*parser (word-ci "\\\t"))
+		(*pack (lambda (_) #\tab))
+	(*parser (word-ci "\\\f"))
+		(*pack (lambda (_) #\page))
+	(*parser (word-ci "\\\n"))
+		(*pack (lambda (_) #\newline))
+	(*parser (word-ci "\\\r"))
+		(*pack (lambda (_) #\return))
+	(*disj 6)
+	done
+	)
+)
+
+;(test-string <StringMetaChar> "\\\\")
+
+(define <StringLiteralChar>
+	(new (*parser <any>)
+     	 (*parser (char #\\))
+      	 (*parser (char #\"))
+      	 (*disj 2)
+      	*diff
+	done)
+)
+;(test-string <StringLiteralChar> "hfh")
+
+(define <StringChar>
+(new 
+	(*parser <StringLiteralChar>)
+	(*parser <StringMetaChar>)
+	(*parser <stringHexChar>)
+	(*disj 3)
+
+done)
+
+)
+
+(define <string>
+	(new
+		(*parser (char #\"))
+		(*parser <StringChar>) *star
+		(*parser (char #\"))
+
+		(*caten 3)
+
+		(*pack-with
+			(lambda(opem string close) 
+				(list->string string)))
+
+	done)
+
+)
+
+
+
+
+(define <InfixPrefixExtensionPrefix>
+	(new 
+		(*parser (word "##"))
+		(*parser (word "#%"))
+		(*disj 2)
+	done)	
+)
+
+(define <mulOrDiv>
+	(new
+		(*parser (char #\*))
+		(*pack (lambda(_) '*))
+		(*parser (char #\/))
+		(*pack (lambda(_) '/))
+		(*disj 2)
+	done)
+)
+
+
+(define <pow>
+	(new
+		(*parser (word "**"))
+		(*pack (lambda(_) '**))
+		(*parser (char #\^))
+		(*pack (lambda(_) '^))
+		(*disj 2)
+	done)
+)
+
+(define <subOrAdd>
+	(new
+		(*parser (char #\+))
+		(*pack (lambda(_) '+))
+		(*parser (char #\-))
+		(*pack (lambda(_) '-))
+		(*disj 2)
+	done)		
+)
+
+
+(define buildInfixOP
+	(lambda (<higherPriorityParser> <op>)
+		(new
+			(*delayed (lambda ()  <higherPriorityParser> ))
+			(*parser <op>)
+			(*delayed (lambda ()  <higherPriorityParser> ))
+			(*caten 2)
+				(*pack-with
+				(lambda (sign rest)
+				   (lambda (first)
+					 `(,sign ,first ,rest)
+				   )))
+			*star
+			(*caten 2)
+			(*pack-with (lambda (first lambda_rest)
+            (fold-left (lambda (op elem)
+                            (elem op)) first lambda_rest)
+          ))
+
+		done)
+	)
+)
+
+
+
+
+
+(define <InfixPow>
+	(buildInfixOP <Number> <pow>)
+)
+
+(define <InfixMulOrDiv>
+	( buildInfixOP  <InfixPow> <mulOrDiv>)
+)
+
+(define <InfixAddOrSub>
+	( buildInfixOP <InfixMulOrDiv> <subOrAdd>)
+)
+
+
+
+(define <InfixSymbol>
+	(new 
+		;;(*parser <Symbol>)
+		(*parser (char #\+))
+		(*parser (char #\-))
+		(*parser (char #\* ))
+		(*parser (char #\/) )
+		(*parser (char #\^ ))
+		(*parser (word "**" ))
+		(*disj 6)
+		;;(*diff)
+	done)
+)
+
+
+
+
+
+
+(test-string <string> "\"\\x61;\\x63;\"")
+
+;(test-string <SymbolChar> "1234abcd")
+;(test-string <SymbolChar> "%33356")
+;(test-string <symbol> "1234abcd")	
+;(test-string <boolean> "#t")
+;(test-string <Char> "#t");
+;(test-string <stringHexChar> "#\\x23")
+
+;(test-string <Char> "#\\x64")
 
 
 
