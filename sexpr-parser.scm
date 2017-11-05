@@ -295,7 +295,7 @@ done)
 
 	(new
 		(*parser (char #\( ))
-		(*delayed (lambda() <sexpr>)) *star
+		(*parser <sexpr>) *star
 		(*parser (char #\) ))
 		(*caten 3)
 		(*pack-with
@@ -322,7 +322,7 @@ done)
 		(*parser <ProperList>)
 		(*caten 2)
 		(*pack-with
-		(lambda (pre vec) vec))
+		(lambda (pre vec) (list->vector vec)))
 	done)
 )
 
@@ -361,14 +361,6 @@ done)
 done)
 )
 
-(define <InfixExpression>
-	(new 
-		(*delayed (lambda () <InfixAddOrSub>) )
-	done)
-)
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Call by Name ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define <CBNameSyntax1>
@@ -400,8 +392,37 @@ done)
 	done)
 )
 
-;(test-string <CBName> "@4")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     whiteSpaces     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+(define <whiteSpaces>
+	(new
+		(*parser (range (integer->char 0) (integer->char 32))) 
+			*star
+		(*pack 
+			(lambda (_) ""))		
+	done)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define <comment>
+	;(*parser (char ))
+
+
+	
+)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     INFIX     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+(define <InfixExpression>
+	(new 
+		(*delayed (lambda () <InfixAddOrSub>) )
+	done)
+)
 
 (define <InfixPrefixExtensionPrefix>
 	(new 
@@ -411,6 +432,16 @@ done)
 	done)	
 )
 
+
+(define <InfixExtension>
+	(new
+		(*parser <InfixPrefixExtensionPrefix>)
+		(*parser <InfixExpression>)
+		(*caten 2)
+		(*pack-with
+			(lambda (pref infExp) infExp))				
+	done)		
+	)
 
 (define <InfixSymbol>
 	(new 
@@ -427,8 +458,6 @@ done)
 )
 
 
-
-
 (define <InfixSexprEscape>
 	(new (*parser <InfixPrefixExtensionPrefix>)
 		(*parser <sexpr>)
@@ -436,8 +465,6 @@ done)
 		(*pack-with (lambda (pref sexpr) sexpr))
 	done)
 )
-
-
 
 
 (define <InfixParen> 
@@ -462,21 +489,22 @@ done)
 	done)	
 )
 
-
-
 (define <InfixArgList>
 	(new
 		(*parser <InfixExpression>)
 		
+		(*parser <whiteSpaces>) *maybe
 		(*parser (char #\,))
+		(*caten 2)
+		(*pack-with (lambda (ws x) x))
 		(*parser <InfixExpression>)
 		(*caten 2)
 		(*pack-with (lambda (sep exp) exp))
 		*star
 		(*caten 2)
 		(*pack-with cons)
-		(*parser <epsilon>)
-		(*disj 2)
+		;;(*parser <epsilon>)
+		;;(*disj 2)
 		
 	done)
 
@@ -491,9 +519,18 @@ done)
 
 (define <InfixFuncCall>
 	(new
+		(*parser <whiteSpaces>) *maybe
 		(*parser (word "(" ))
+		(*caten 2)
+		(*pack-with (lambda (w exp) exp))
+
 		(*parser <InfixArgList>)
+		
+		(*parser <whiteSpaces>) *maybe
 		(*parser (word ")" ))
+		(*caten 2)
+		(*pack-with (lambda (w exp) exp))
+
 		(*caten 3)
 		
 		(*pack-with
@@ -515,12 +552,6 @@ done)
 		)
 	done)
 )
-
-
-
-
-
-
 
 (define <mulOrDiv>
 	(new
@@ -557,9 +588,23 @@ done)
 (define buildInfixOP
 	(lambda (<higherPriorityParser> <op>)
 		(new
+			(*parser <whiteSpaces>) *maybe
 			(*parser <higherPriorityParser> )
+			(*caten 2)
+			(*pack-with (lambda (w exp) exp))			
+			
+			(*parser <whiteSpaces>) *maybe
 			(*parser <op>)
-			(*parser   <higherPriorityParser> )
+			(*caten 2)
+			(*pack-with (lambda (w op) op))
+			
+			(*parser <whiteSpaces>) *maybe
+			(*parser   <higherPriorityParser> )	
+			(*parser <whiteSpaces>) *maybe
+			
+			(*caten 3)
+			(*pack-with (lambda (w1 op w2) op))
+				
 			(*caten 2)
 			*star
 			(*caten 2)
@@ -569,7 +614,7 @@ done)
 					(lambda (a x) `(,(car x) ,a ,@(cdr x)))
 					first
 					rest
-				  )))
+					)))
 
 		done)
 	)
@@ -605,17 +650,8 @@ done)
 	done)	
 )
 
-
-
-
-
-
-
-
 (define <InfixPow>
 	(buildInfixOP <FuncAndArraysParser> <pow>)
-	
-	
 )
 
 (define <InfixMulOrDiv>
@@ -625,12 +661,6 @@ done)
 (define <InfixAddOrSub>
 	( buildInfixOP <InfixMulOrDiv> <subOrAdd>)
 )
-
-
-
-
-
-
 
 
 ;(test-string <string> "\"\\x61;\\x63;\"")
@@ -644,7 +674,4 @@ done)
 
 ;(test-string <Char> "#\\x64")
 ;(test-string <InfixAddOrSub> "1+1")
-
-
-
 
