@@ -482,10 +482,11 @@ done)
 
 (define <InfixNeg>
 	(new
-		(*parser #\-)
+		(*parser (char #\-))
 		(*parser <InfixExpression>)
 		(*caten 2)
-		(*pack-with (lambda (sign expression) (list `- expression))	)
+		(*pack-with
+			(lambda (minus expr) `(- ,expr)))
 	done)	
 )
 
@@ -503,8 +504,10 @@ done)
 		*star
 		(*caten 2)
 		(*pack-with cons)
-		;;(*parser <epsilon>)
-		;;(*disj 2)
+
+
+		(*parser <epsilon>)
+		(*disj 2)
 		
 	done)
 
