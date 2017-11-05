@@ -509,7 +509,9 @@ done)
 		(*parser (char #\]))
 		(*caten 3)
 		(*pack-with 
-			(lambda (arr openBR exp closeBR) `(vector-ref ,arr ,exp))
+			(lambda (penBR exp closeBR) 
+				(lambda (arr)
+				`(vector-ref ,arr ,exp)))
 		)
 	done)
 )
@@ -588,8 +590,8 @@ done)
 (define <FuncAndArraysParser>
 	(new
 		(*parser <basicValuesParser>)
-		(*parser <InfixFuncCall>)
 		(*parser <InfixArrayGet>)
+		(*parser <InfixFuncCall>)
 		(*disj 2)
 		*star
 		(*caten 2)	
