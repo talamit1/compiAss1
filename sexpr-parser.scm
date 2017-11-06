@@ -306,9 +306,9 @@ done)
 (define <ImproperList>
 	(new
 		(*parser (char #\( ))
-		(*delayed (lambda() <sexpr>)) *plus
+		(*parser <sexpr>) *plus
 		(*parser (char #\. ))
-		(*delayed (lambda() <sexpr>))
+		(*parser <sexpr>)
 		(*parser (char #\) ))
 		(*caten 5)
 		(*pack-with 
@@ -405,14 +405,21 @@ done)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define <comment>
-	;(*parser (char ))
+#;(define <comment>
+	(new
+		(*parser (char #\; ))
+		(*parser <any>) *star
 
 
-	
+
+		(*caten 2)
+		(*pack-with
+		(lambda (pref any) "" ))
+	done)
 )
 
 
+;(test-string <comment> "%sdafadfsfsdf" )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     INFIX     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -623,6 +630,7 @@ done)
 	)
 )
 
+(test-string <InfixExpression> "1+1")
 (define <basicValuesParser>
 	(new
 		(*parser <Char>)
@@ -665,16 +673,13 @@ done)
 	( buildInfixOP <InfixMulOrDiv> <subOrAdd>)
 )
 
-
 ;(test-string <string> "\"\\x61;\\x63;\"")
-
 ;(test-string <SymbolChar> "1234abcd")
 ;(test-string <SymbolChar> "%33356")
 ;(test-string <symbol> "1234abcd")	
-;(test-string <boolean> "#t")
+;(test-string <booleaPt")
 ;(test-string <Char> "#t");
 ;(test-string <stringHexChar> "#\\x23")
-
 ;(test-string <Char> "#\\x64")
 ;(test-string <InfixAddOrSub> "1+1")
 
