@@ -405,7 +405,7 @@ done)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#;(define <comment>
+(define <comment>
 	(new
 		(*parser (char #\; ))
 		(*parser <any>) *star
@@ -630,7 +630,8 @@ done)
 	)
 )
 
-(test-string <InfixExpression> "1+1")
+
+
 (define <basicValuesParser>
 	(new
 		(*parser <Char>)
