@@ -1,9 +1,8 @@
-; Change to your own location
-(load "~/compilation/parser-new.so")
-(load "~/compilation/compiler.scm")
-
-(define <my-sexpr> <sexpr-2>) ; Change to your sexpr parser name
-(define <staff-sexpr> <sexpr>)
+;;;; credit to asaf halili from 2017 course that made the original tests file
+(load "parser.so") 	      ;; this is mayer sexpr-parser file, compiled+encrypted version from 2017
+(define <staff-sexpr> <sexpr>) ; this is mayer sexpr parser 
+(load "sexpr-parser.scm") ;; this is your sexpr-parser file
+(define <my-sexpr> <sexpr>)   
 
 (define testVSstaff
 	(lambda (input)
@@ -48,7 +47,7 @@
 (define booleanTests (list "#t" "#f" "   #t" "#f   " "  #t    "))
 	 
 (define numberTests
-	(list "0" "9" "123" "0987" "-5" "+8" "   -456   "
+	(list "0" "9" "1001" "-125" "1/2" "-2/3" "123" "0987" "-5" "+8" "   -456   "
 	      "657" "0/4" "8/28" "-2/4" "+2/4" "-2 / 4"
 	 ))
 	  
@@ -56,22 +55,22 @@
 	(list	"#\\a" "#\\B" "#\\9" "#\\space" "#\\lambda"
 		"#\\newline" "#\\nul" "#\\page"
 		"#\\return" "#\\tab" "#\\x41" "#\\x23" "#\\x20" "  #\\xab   "
-		"#\\x0" "#\\x110000" "#\\abc" "#\\x" "#\\x[2]" "#\\abc[1]"
+        "#\\x0"  "#\\x"  
 	  ))
 	  
 (define stringTests
 	(list
-	  "\"\\\\\"" "\"\\t\"" "\"\\\"\"" "\"\\f\""	  	  
+	  
+	"\"test\\\\\\n\\t\"" "\"test\" ""\"\\\\\"" "\"\\t\"" "\"\\\"\"" "\"\\f\""	  	  
 	  "\"\\n\"" "\"\\r\"" "\"\\x09af;\"" "\"\\x41;\""
 	  "\" 4 1;\"" "    \"  Akuna Matata  \"    "
 	  "\"\\x0;\""
-	  "\"\\x110000;\"" 
 	  "\"\\x40; ABC \\t \\\" \" "
 	  ))
 
 (define symbolTests
 	(list 
-	"0123456789" "abcdeABCDE" "!$^*-_=+<>?/" 
+	"0123456789" "abcdeABCDE" "!$^*-_=+<>?/"  "symbol" "()"
 	"0123456789abcdeABCDE!$^*-_=+<>?/" 
 	"    Hellomynameisasaf   "
 	"123Ff"
@@ -81,13 +80,13 @@
 	  
 (define properListTests
 	(list
-	  "()" "(a)" "(\"abc\")" "(a #t #f -2/4 -14 0 \"\\t\" #\\lambda \"\\x41;\")"
+	  "(1 (2 (3)))" "(1 2 3)" "()" "(a)" "(\"abc\")" "(a #t #f -2/4 -14 0 \"\\t\" #\\lambda \"\\x41;\")"
 	  "(#\\return)" "( (a b c) #t #f)" "(#\\a (a b .c ) -54/32)" "  ((a b.c))   "
 	  ))	  
 	  
 (define improperListTests
 	(list	   
-	    "(.#t)" "(a b      #t c . (d e #f \"str1\"   )    )"
+	    "(1 2 3 . ())" "(1 2 . 3)" "(1 . 2)" "(.#t)" "(a b      #t c . (d e #f \"str1\"   )    )"
 	    "(#t abc . a)"							
 	    "(abc#t . a)"
 	    "(#t #f #\\a abc . (a b c)  )"
@@ -101,12 +100,12 @@
   
 (define quotedTests
   (list 
-    "'123" "'#t" "'#\\lambda" "'\"123a\"" "  'a123   " "  '   1SymbolWithSpacesAfterQuote456  "
+    "'a" "'123" "'#t" "'#\\lambda" "'\"123a\"" "  'a123   " "  '   1SymbolWithSpacesAfterQuote456  "
   ))
   
 (define quasiquotedTests
   (list 
-    "`123" "`#t" "`#\\lambda" "`\"123a\"" "   `a123  "  "  `   2SymbolWithSpacesAfterQuasiQuote321  "
+	"`(1 ,@a 3)" "`,'e" "`a" "`123" "`#t" "`#\\lambda" "`\"123a\"" "   `a123  "  "  `   2SymbolWithSpacesAfterQuasiQuote321  "
   ))
   
 (define unquotedTests
@@ -135,10 +134,10 @@
 	    "  #%  5   /   2 [-4 + a *  -7/16  * 9 * 154 ] "
 	    " ## 123a[ + bc321 ** 3  /  6]" 
 	    "## a[0] + a[a[a[a[a[0]]]]]"
-	    "##ABC[##a+2]"
-	    "##ABC[###\\a]"
-	    "##-##ab3+5b+5[3]"
-	    "##()()()()[]"
+	    "##ABC[##a+2]"                            
+	    "##ABC[###\\a]"                           
+	   "##-##ab3+5b+5[3]"                         
+	    "##()()()()[]"                            
 	    "##1/2-2Symbol+Sym45[5+4*a-12/45]"
 	    "#%1a[5^4]"
 	    "##a[1b]"
@@ -149,9 +148,9 @@
 
 (define infixFuncallTests
 	(list	  
-	    "##f()"
-	    "##A(      )"
-	    "##-FUNC()"
+	    "##f()"                          
+	    "##A(      )"                    
+            "##-FUNC()"                    
 	    "##func(a,b,c,d,e,fgh)"
 	    "## FunctionCall123 ( arg1  , arg2  , arg3 , arg5)"
 	    "## func ( 1+2, 3*4)"
@@ -203,12 +202,48 @@
 	    "#% a/b + c/d"
 	    "##-a*-b"
 	    "##-a-b-c"
-	    "##a+b+c"
-	    "##---a"
+	    "##a+b+c"                                
 	    "##a-(12+34)"
 	    "#%f[5][7](4)"
 	    "#%f(3)(7)[4]"
 	    "##FUNCTIONnameWithArray[1 #; (a^2+b^2)/(c^2)](2)[3+4^(-50/64)*82+a](## \"This is infixSexprEscape\" #; \"This is comment\")"
+		"## - 5 / 1 - (4 - 5) + ## (+ 1 2)"
+		"(let* ((inf ##f(3 * 2 ^ a))
+                               (pre (- 1 1 1 s))
+                               (t ## inf * pre))
+                          (+ inf pre t))"
+						  
+		"(let ((vec (- 1 ##3/5-2^4*6)))
+                          (- vec (g vec) ## g(g(g(vec - a[vec])))))"
+						  
+		"##f( a[a[a[a[9]]]], cons(x * 5, x ^ x), list(a , a[2]))"
+		
+		"(+ 4 5 ## (3 - 5 * 2 - 1 - 5 - 6) ## 6)"
+		
+		"(/ ( - 3 5) ## (2 / 5 + 3))"
+		
+		"##f(4+5/2-3-4, a[f(##(+ 6 7))])"
+		
+		"(+ 1 ##2 + 3 a b c)"
+		
+		"(let ((result (* n ##3/4^3 + 2/7^5)))
+		(* result 	(f result) ##g(g(g(result, result), result), result)))"
+		
+		"(## 1 + (2 + 3)	 * 4 + 2 ^ 2 + ( 3 / 4)) ; + 4"
+		
+		"(+ ##9 + 4^3 6)"
+		
+		"( let ((x 2)
+		(y 8))
+		+ x y		)"
+		
+		" \" SHALOM \" ; 4"
+		
+		"#; #\\lambda ## #; 5^2*-12 1+1/2+FUNC(a#;1+2+3,b,1+5)" 
+		
+		"#% (1+2) "
+		
+		"##1+2   [3+4]"
 ))
 
 (define infixSexprEscapeTests 
@@ -218,17 +253,21 @@
     "####a+b +c"
     "##-##a+b +c+d"
     "##(X ^ ##a+b +c*d)"
+	"## a[0] + a[a[0]] * #% (+ 5 7 4) * ## a[a[a[0]]] ^ a[a[a[a[0]]]] ^ a[a[a[a[a[0]]]]]"
 ))
 
 (define commentsTests
   (list
     "## 2 - 3 - 4"
-    "## 2- #; 3 - 4 + 5 * 6 ^ 7 +8 #; 1+2^3"
+    "## 2- #; 3 - 4 + 5 * 6 ^ 7 +8 #; 1+2^3 5"
+	"## 2 - #; 3 - 4 + 5 * 6 ^ 7 8 - 5"
     "#####;1^2+3 \"abc\""
     "#####;\"a+b\" 1/2"
     "#####;##2^3 1/2 ; Akuna Matata"
-    
+    "## 1 + #; #; #; 2 3 4 5"
     ; Line Comments
+	"#;'(sexpr comment) 1"
+	"1 ;comment"
     " 2^5 ; ## 3+4+5"
     "; abc"
     
@@ -309,10 +348,10 @@
       (cons "Unquoted" unquotedTests)
       (cons "Proper List" properListTests)
       (cons "Improper List" improperListTests)
-      (cons "InfixArrayGet" infixArrayGetTests)
-      (cons "infixSexprEscape" infixSexprEscapeTests)
-      (cons "InfixExp" infixExpTests)  
-      (cons "InfixFuncall" infixFuncallTests)
-      (cons "Comments" commentsTests)
-      (cons "MayerExamples" MayerExamples)    
+      (cons "InfixArrayGet" infixArrayGetTests)        
+      (cons "infixSexprEscape" infixSexprEscapeTests) 
+      (cons "InfixExp" infixExpTests)              
+      (cons "InfixFuncall" infixFuncallTests)        
+      (cons "Comments" commentsTests)               
+      (cons "MayerExamples" MayerExamples)            
 ))

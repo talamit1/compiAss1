@@ -37,21 +37,21 @@
 	(new
 		(*parser (word "#;"))
 		(*delayed (lambda ()  <sexpr>))
-		(*caten 2)
-		(*pack-with
-			(lambda (pre sexp) ""))
+		(*caten 2)		
 	done)
 )
 
-(define <ignore>
+
+(define <Ignore>
 	(new
 		(*parser <whiteSpaces>)
 		(*parser <comment>)
 		(*parser <sexp-comment>)
-		(*disj 3) *star
+		(*disj 3)
+		*plus
 	done)
+	)
 
-)
 
 ;(test-string <comment> "%sdafadfsfsdf" )
 
@@ -63,18 +63,11 @@
 	(range #\1 #\9))
 
 (define <nat>
-  (new (*parser <digit1-9>)
-       (*parser <digit0-9>) *star
-       (*caten 2)
-
-       (*parser (char #\0))
-       (*parser (range #\0 #\9))
-       *not-followed-by
-       (*disj 2)
+  (new (*parser <digit0-9>) *plus 
         (*pack 
-       	(lambda (resList) (string->number (list->string (cons (car resList) (cadr resList)))) )
-       )
-       done))
+       	(lambda (resList) (string->number (list->string `(,@resList)))))
+	   done)
+)
 
 (define <plus>
 	(pack
@@ -141,6 +134,10 @@
 		(*parser <integer>)
 		(*parser (char #\/))
 		(*parser <nat>)
+		(*parser (char #\0))
+		(*pack (lambda (a) (char->integer a)))
+		*diff
+
 		(*caten 3)
 		
 		(*pack-with
@@ -339,7 +336,7 @@ done)
 
 (define <sexpr> 
   (new
-	(*parser <whiteSpaces>) *maybe
+	(*parser <Ignore>) *maybe
 	
   	(*parser <boolean>)
   	(*parser <Char>)
@@ -357,7 +354,7 @@ done)
   	(*delayed (lambda () <InfixExtension>))
 	(*disj 14) 
 		
-	(*parser <whiteSpaces>) *maybe
+	(*parser <Ignore>) *maybe
 
 	(*caten 3)
 	(*pack-with
