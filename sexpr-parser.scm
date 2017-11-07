@@ -1,5 +1,24 @@
 (load "pc.scm") 
  
+(define <sexpr> 
+  (new
+  	(*parser <boolean>)
+  	(*parser <Char>)
+  	(*parser <Number>)
+  	(*parser <string>)
+  	(*parser <symbol>)
+  	(*delayed (lambda () <ProperList>))
+  	(*delayed (lambda () <ImproperList>))
+  	(*delayed (lambda () <Vector>))
+  	(*delayed (lambda () <Quoted>))
+  	(*delayed (lambda () <QuasiQuoted>))
+  	(*delayed (lambda () <Unquoted>))
+  	(*delayed (lambda () <UnquoteAndSpliced>))
+  	(*delayed (lambda () <CBName>))
+  	(*delayed (lambda () <InfixExtension>))
+  	(*disj 14) 
+  done) 
+  ) 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     whiteSpaces     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
