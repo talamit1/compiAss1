@@ -1,9 +1,24 @@
 (load "pc.scm") 
  
 (define <sexpr> 
-  ;; fill in the s-expression parser details here 
+  (new
+  	(*parser <boolean>)
+  	(*parser <Char>)
+  	(*parser <number>)
+  	(*parser <string>)
+  	(*parser <symbol>)
+  	(*delayed (lambda () <ProperList>))
+  	(*delayed (lambda () <ImproperList>))
+  	(*delayed (lambda () <Vector>))
+  	(*delayed (lambda () <Quoted>))
+  	(*delayed (lambda () <QuasiQuoted>))
+  	(*delayed (lambda () <Unquoted>))
+  	(*delayed (lambda () <UnquoteAndSpliced>))
+  	(*delayed (lambda () <CBName>))
+  	(*delayed (lambda () <InfixExtension>))
+  	(*disj 14) 
+  done) 
   ) 
-
 
 (define <digit0-9>
 	(range #\0 #\9))
@@ -306,9 +321,9 @@ done)
 (define <ImproperList>
 	(new
 		(*parser (char #\( ))
-		(*delayed (lambda() <sexpr>)) *plus
+		(*parser <sexpr>) *plus
 		(*parser (char #\. ))
-		(*delayed (lambda() <sexpr>))
+		(*parser <sexpr>)
 		(*parser (char #\) ))
 		(*caten 5)
 		(*pack-with 
@@ -405,11 +420,37 @@ done)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define <Linecomment>
-	
+(define <comment>
+	(new
+		(*parser (char #\; ))
+		(*parser <any>) *star
+		(*parser (char #\newline))
+		(*parser <end-of-input>)
+		(*disj 2)
+		*diff
+		*star
+
+		(*parser (char #\newline))
+		(*parser <end-of-input>)
+		(*disj 2)
+
+		(*caten 3)
+		(*pack-with
+		(lambda (com chars end) "" ))
+	done)
 )
 
+(define <sexp-comment>
+	(new
+		(*parser (word "#;"))
+		(*parser <sexpr>)
+		(*caten 2)
+		(*pack-with
+			(lambda (pre sexp) ""))
+	done)
+)
 
+;(test-string <comment> "%sdafadfsfsdf" )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     INFIX     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -702,15 +743,15 @@ done)
 )
 
 
-;(test-string <string> "\"\\x61;\\x63;\"")
 
+(test-string <InfixExpression> "1^2^3^4")
+(test-string <comment> ";\"\\x61;\\x63;\"")
 ;(test-string <SymbolChar> "1234abcd")
 ;(test-string <SymbolChar> "%33356")
 ;(test-string <symbol> "1234abcd")	
-;(test-string <boolean> "#t")
+;(test-string <booleaPt")
 ;(test-string <Char> "#t");
 ;(test-string <stringHexChar> "#\\x23")
-
 ;(test-string <Char> "#\\x64")
 ;(test-string <InfixAddOrSub> "1+1")
 
