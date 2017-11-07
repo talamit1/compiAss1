@@ -1,8 +1,6 @@
 (load "pc.scm") 
  
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     whiteSpaces     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
 (define <whiteSpaces>
 	(new
@@ -35,15 +33,25 @@
 	done)
 )
 
-;(define <sexp-comment>
-;	(new
-;		(*parser (word "#;"))
-;		(*parser <sexpr>)
-;		(*caten 2)
-;		(*pack-with
-;			(lambda (pre sexp) ""))
-;	done)
-;)
+(define <sexp-comment>
+	(new
+		(*parser (word "#;"))
+		(*delayed (lambda ()  <sexpr>))
+		(*caten 2)
+		(*pack-with
+			(lambda (pre sexp) ""))
+	done)
+)
+
+(define <ignore>
+	(new
+		(*parser <whiteSpaces>)
+		(*parser <comment>)
+		(*parser <sexp-comment>)
+		(*disj 3) *star
+	done)
+
+)
 
 ;(test-string <comment> "%sdafadfsfsdf" )
 
@@ -87,25 +95,21 @@
 )
 
 
-(define append2
-	(lambda (st1 st2 )
-		(string-append (string st1) (string st2)))
-	)
-
 
 (define <boolean>
 	(new
-		(*parser (char-ci #\#))
+		(*parser (char #\#))
 		(*parser (char-ci #\t))
 		(*caten 2)
-		(*pack-with append2)
-		
-		(*parser (char-ci #\#))
+		(*pack-with 
+			(lambda (ch bool) #t))
+	
+		(*parser (char #\#))
 		(*parser (char-ci #\f))
 		(*caten 2)
-		(*pack-with append2)
+		(*pack-with 
+			(lambda (ch bool) #f))
 	
-
 		(*disj 2)
 	done)
 )
@@ -335,7 +339,8 @@ done)
 
 (define <sexpr> 
   (new
-  	
+	(*parser <whiteSpaces>) *maybe
+	
   	(*parser <boolean>)
   	(*parser <Char>)
   	(*parser <Number>)
@@ -350,7 +355,13 @@ done)
   	(*delayed (lambda () <UnquoteAndSpliced>))
   	(*delayed (lambda () <CBName>))
   	(*delayed (lambda () <InfixExtension>))
-  	(*disj 14) 
+	(*disj 14) 
+		
+	(*parser <whiteSpaces>) *maybe
+
+	(*caten 3)
+	(*pack-with
+		(lambda (ig1 sx ig2) sx))
   	
   done) 
   ) 

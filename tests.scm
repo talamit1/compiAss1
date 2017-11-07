@@ -298,7 +298,7 @@
 
 (display "> (test-string <sexpr> \"13/0\")")
 (newline)
-(write (test-string <sexpr> "13/0")) ;; should be: ((match \x31;3/0) (remaining ""))
+(run-test (test-string <sexpr> "13/0")) ;; should be: ((match \x31;3/0) (remaining ""))
 (newline)
 (newline)
 
@@ -405,7 +405,7 @@
 
 (display "> (test-string <sexpr> \"\"\r\"\")")
 (newline)
-(run-test (test-string <sexpr> "\"\r\"") '(test-string <sexpr> "\"\r\""))
+(run-test (test-string <sexpr> "\"\r\"") '((match "\r") (remaining "")))
 (newline)
 (newline)
 
