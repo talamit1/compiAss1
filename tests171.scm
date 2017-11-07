@@ -334,8 +334,118 @@
 
 ))
 
+
+(define lastYearTests
+	(list	  
+		"#t"
+		
+		"1001"
+		
+		"-125"
+		
+		"1/2"
+		
+		"-2/3"
+		
+		"#\\a"
+		
+		"#\\lambda"
+		
+		"\"test\""
+		
+		"\"test\\\\\\n\\t\""
+		
+		"symbol"
+		
+		"()"
+		
+		"'a"
+		
+		"(1 . 2)"
+		
+		"(1 2 3)"
+		
+		"(1 (2 (3)))"
+		
+		"(1 2 . 3)"
+		
+		"(1 2 3 . ())"
+		
+		"1 ;comment"
+		
+		"#;'(sexpr comment) 1"
+		
+		"`a"
+		
+		"`,'e"
+		
+		"`(1 ,@a 3)"
+		
+		"#()"
+		
+		"#(1 2)"
+		
+		"#((a b) #(1) 3)"
+		
+		"## 2 - #; 3 - 4 + 5 * 6 ^ 7 8 - 5"
+		
+		"(let* ((d ##sqrt(b ^ 2 - 5 * 3 - 1 - 1 - 4 * a * c))
+		  (x1 ##((-b + d) / (2 * a)))
+		  (x2 ##((-b - d) / (a * 2))))
+		  `((x1 ,x1) (x2 ,x2)))"
+		
+		"## - 5 / 1 - (4 - 5) + ## (+ 1 2)"
+		
+		"## a[0] + a[a[0]] * #% (+ 5 7 4) * ## a[a[a[0]]] ^ a[a[a[a[0]]]] ^ a[a[a[a[a[0]]]]]"
+		
+		"(let* ((inf ##f(3 * 2 ^ a))
+									   (pre (- 1 1 1 s))
+									   (t ## inf * pre))
+								  (+ inf pre t))"
+		
+		"(let ((vec (- 1 ##3/5-2^4*6)))
+								  (- vec (g vec) ## g(g(g(vec - a[vec])))))"
+		
+		"##f( a[a[a[a[9]]]], cons(x * 5, x ^ x), list(a , a[2]))"
+		
+		"(+ 4 5 ## (3 - 5 * 2 - 1 - 5 - 6) ## 6)"
+		
+		"(/ ( - 3 5) ## (2 / 5 + 3))"
+		
+		"##f(4+5/2-3-4, a[f(##(+ 6 7))])"
+		
+		"(let ((result ##a[0] + 2 * a[1] +	 3 ^ a[2] - a[3] * b[i][j][i + j]))
+		result)	"
+		
+		"## 2 + #; 3 - 4 8"
+		
+		"(+ 1 ##2 + 3 a b c)"
+		
+		"(let ((result (* n ##3/4^3 + 2/7^5)))
+		(* result 	(f result) ##g(g(g(result, result), result), result)))"
+		
+		"(## 1 + (2 + 3)	 * 4 + 2 ^ 2 + ( 3 / 4)) ; + 4"
+		
+		"(+ ##9 + 4^3 6)"
+		
+		"( let ((x 2)
+				(y 8))
+				+ x y		)"
+		
+		" \" SHALOM \" ; 4"
+		
+		"#; #\\lambda ## #; 5^2*-12 1+1/2+FUNC(a#;1+2+3,b,1+5)"  
+		
+		"#% (1+2) "
+		
+		"##1+2   [3+4]"
+		
+		"#\\newline"
+)) 
+
 (runAllTests
   (list
+	  (cons "last year testcases" lastYearTests)
       (cons "Boolean" booleanTests)
       (cons "Number" numberTests)
       (cons "Char" charTests)
@@ -353,5 +463,6 @@
       (cons "InfixExp" infixExpTests)              
       (cons "InfixFuncall" infixFuncallTests)        
       (cons "Comments" commentsTests)               
-      (cons "MayerExamples" MayerExamples)            
+	  (cons "MayerExamples" MayerExamples) 
+		           
 ))
