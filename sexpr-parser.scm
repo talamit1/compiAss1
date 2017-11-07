@@ -286,13 +286,13 @@ done)
 		(*pack (lambda (_) #\\))
 	(*parser (word-ci "\\\""))
 		(*pack (lambda (_) #\"))
-	(*parser (word-ci "\\\t"))
+	(*parser (word-ci "\\t"))
 		(*pack (lambda (_) #\tab))
-	(*parser (word-ci "\\\f"))
+	(*parser (word-ci "\\f"))
 		(*pack (lambda (_) #\page))
-	(*parser (word-ci "\\\n"))
+	(*parser (word-ci "\\n"))
 		(*pack (lambda (_) #\newline))
-	(*parser (word-ci "\\\r"))
+	(*parser (word-ci "\\r"))
 		(*pack (lambda (_) #\return))
 	(*disj 6)
 	done
@@ -423,8 +423,18 @@ done)
 (define <QuasiQuoted>
 	(catenPreSexp #\` 'quasiquote)
 )
+
 (define <Unquoted>
-	(catenPreSexp #\, 'unquote)
+	(new
+		(*parser (char #\,))
+		(*parser (char #\@))
+		*not-followed-by
+		(*parser <sexpr>)
+		(*caten 2)
+		(*pack-with
+			(lambda (pref sx) (list 'unquote sx)))
+	done)
+	;(catenPreSexp #\, 'unquote)
 )
 
 
