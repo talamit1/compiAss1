@@ -215,6 +215,19 @@ done)
 		(*parser <VisibleSimpleChar>)
 		(*disj 3)
 		(*caten 2)
+
+		(*parser <any>)
+		
+		(*parser <Ignore>)
+		(*parser (char #\,))
+		(*parser (char #\]))
+		(*parser (char #\)))
+		(*disj 4)
+		
+		*diff
+		
+		*not-followed-by
+
 		(*pack-with
 			(lambda(charPref ch) ch))
 		done
