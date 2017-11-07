@@ -405,12 +405,10 @@ done)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define <comment>
-	;(*parser (char ))
-
-
+(define <Linecomment>
 	
 )
+
 
 
 
@@ -623,6 +621,44 @@ done)
 	)
 )
 
+
+
+
+
+(define buildInfixPow
+	(lambda (<higherPriorityParser> <op>)
+		(new
+			(*parser <whiteSpaces>) *maybe
+			(*parser <higherPriorityParser> )
+			(*caten 2)
+			(*pack-with (lambda (w exp) exp))			
+			
+			(*parser <whiteSpaces>) *maybe
+			(*parser <op>)
+			(*caten 2)
+			(*pack-with (lambda (w op) op))
+			(*caten 2)
+			(*pack-with (lambda (x y) x))
+			*star
+			(*parser <whiteSpaces>) *maybe
+			(*parser   <higherPriorityParser> )	
+			(*parser <whiteSpaces>) *maybe
+			
+			(*caten 3)
+			(*pack-with (lambda (w1 op w2) op))	
+			(*caten 2)
+			(*pack-with
+				(lambda (restList lastArg)
+				  (fold-right
+					(lambda (a x) `( expt ,a ,x))
+					lastArg
+					restList
+					)))
+
+		done)
+	)
+)
+
 (define <basicValuesParser>
 	(new
 		(*parser <Char>)
@@ -654,7 +690,7 @@ done)
 )
 
 (define <InfixPow>
-	(buildInfixOP <FuncAndArraysParser> <pow>)
+	(buildInfixPow <FuncAndArraysParser> <pow>)
 )
 
 (define <InfixMulOrDiv>
