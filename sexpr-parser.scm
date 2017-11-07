@@ -150,7 +150,11 @@
 
 
 (define <Number>
-	(disj <fraction> <integer>)	
+(new 
+	(*parser (disj <fraction> <integer>))
+	(*delayed (lambda () <SymbolChar>))
+	*not-followed-by	
+done)	
 )
 
 
@@ -714,11 +718,26 @@ done)
 	)
 )
 
+
+(define <notAnumberInfixSymbol>
+	(new
+		(*parser <InfixSymbol>)
+		(*parser (range #\0 #\9))
+		*diff
+	done)
+)
+
 (define <basicValuesParser>
 	(new
 		(*parser <InfixIgnore>) *maybe
 		(*parser <Char>)
-		(*parser <Number>)
+
+		(*parser <fraction>)
+		(*parser <integer>)
+		(*disj 2)
+		(*parser <notAnumberInfixSymbol>)
+		*not-followed-by
+
 		(*parser <InfixSymbol>)
 		(*parser <InfixParen>)
 		(*parser <InfixSexprEscape>)
