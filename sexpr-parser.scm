@@ -517,7 +517,7 @@ done)
 
 (define <InfixSymbol>
 	(new 
-		(*parser <symbol>)
+		(*parser <SymbolChar> )
 		(*parser (char #\+))
 		(*parser (char #\-))
 		(*parser (char #\* ))
@@ -526,6 +526,8 @@ done)
 		(*parser (word "**" ))
 		(*disj 6)
 		*diff
+		*plus
+		(*pack (lambda (lst) (string->symbol (list->string lst))))
 	done)
 )
 
@@ -555,7 +557,7 @@ done)
 (define <InfixNeg>
 	(new
 		(*parser (char #\-))
-		(*parser <InfixExpression>)
+		(*delayed (lambda() <FuncAndArraysParser>))
 		(*caten 2)
 		(*pack-with
 			(lambda (minus expr) `(- ,expr)))
