@@ -66,8 +66,6 @@
 ;(test-string <comment> "%sdafadfsfsdf" )
 
 
-
-
 (define <digit0-9>
 	(range #\0 #\9))
 
@@ -355,7 +353,7 @@ done)
 
 (define <sexpr> 
   (new
-  	(*parser <whiteSpaces>)
+  	
   	(*parser <boolean>)
   	(*parser <Char>)
   	(*parser <Number>)
@@ -371,9 +369,8 @@ done)
   	(*delayed (lambda () <CBName>))
   	(*delayed (lambda () <InfixExtension>))
   	(*disj 14) 
-  	(*parser <whiteSpaces>)
-  	(*caten 3)
-  	(*pack-with (lambda (w sexpr w2) sexpr))
+  	
+  	
   done) 
   ) 
 
