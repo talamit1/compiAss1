@@ -1,24 +1,53 @@
 (load "pc.scm") 
  
-(define <sexpr> 
-  (new
-  	(*parser <boolean>)
-  	(*parser <Char>)
-  	(*parser <number>)
-  	(*parser <string>)
-  	(*parser <symbol>)
-  	(*delayed (lambda () <ProperList>))
-  	(*delayed (lambda () <ImproperList>))
-  	(*delayed (lambda () <Vector>))
-  	(*delayed (lambda () <Quoted>))
-  	(*delayed (lambda () <QuasiQuoted>))
-  	(*delayed (lambda () <Unquoted>))
-  	(*delayed (lambda () <UnquoteAndSpliced>))
-  	(*delayed (lambda () <CBName>))
-  	(*delayed (lambda () <InfixExtension>))
-  	(*disj 14) 
-  done) 
-  ) 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     whiteSpaces     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+(define <whiteSpaces>
+	(new
+		(*parser (range (integer->char 0) (integer->char 32))) 
+			*star
+		(*pack 
+			(lambda (_) ""))		
+	done)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define <comment>
+	(new
+		(*parser (char #\; ))
+		(*parser <any>) *star
+		(*parser (char #\newline))
+		(*parser <end-of-input>)
+		(*disj 2)
+		*diff
+		*star
+
+		(*parser (char #\newline))
+		(*parser <end-of-input>)
+		(*disj 2)
+
+		(*caten 3)
+		(*pack-with
+		(lambda (com chars end) "" ))
+	done)
+)
+
+;(define <sexp-comment>
+;	(new
+;		(*parser (word "#;"))
+;		(*parser <sexpr>)
+;		(*caten 2)
+;		(*pack-with
+;			(lambda (pre sexp) ""))
+;	done)
+;)
+
+;(test-string <comment> "%sdafadfsfsdf" )
+
+
+
 
 (define <digit0-9>
 	(range #\0 #\9))
@@ -305,6 +334,30 @@ done)
 
 )
 
+(define <sexpr> 
+  (new
+  	(*parser <whiteSpaces>)
+  	(*parser <boolean>)
+  	(*parser <Char>)
+  	(*parser <Number>)
+  	(*parser <string>)
+  	(*parser <symbol>)
+  	(*delayed (lambda () <ProperList>))
+  	(*delayed (lambda () <ImproperList>))
+  	(*delayed (lambda () <Vector>))
+  	(*delayed (lambda () <Quoted>))
+  	(*delayed (lambda () <QuasiQuoted>))
+  	(*delayed (lambda () <Unquoted>))
+  	(*delayed (lambda () <UnquoteAndSpliced>))
+  	(*delayed (lambda () <CBName>))
+  	(*delayed (lambda () <InfixExtension>))
+  	(*disj 14) 
+  	(*parser <whiteSpaces>)
+  	(*caten 3)
+  	(*pack-with (lambda (w sexpr w2) sexpr))
+  done) 
+  ) 
+
 
 (define <ProperList>
 
@@ -408,49 +461,6 @@ done)
 )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     whiteSpaces     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
-(define <whiteSpaces>
-	(new
-		(*parser (range (integer->char 0) (integer->char 32))) 
-			*star
-		(*pack 
-			(lambda (_) ""))		
-	done)
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     comments     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define <comment>
-	(new
-		(*parser (char #\; ))
-		(*parser <any>) *star
-		(*parser (char #\newline))
-		(*parser <end-of-input>)
-		(*disj 2)
-		*diff
-		*star
-
-		(*parser (char #\newline))
-		(*parser <end-of-input>)
-		(*disj 2)
-
-		(*caten 3)
-		(*pack-with
-		(lambda (com chars end) "" ))
-	done)
-)
-
-(define <sexp-comment>
-	(new
-		(*parser (word "#;"))
-		(*parser <sexpr>)
-		(*caten 2)
-		(*pack-with
-			(lambda (pre sexp) ""))
-	done)
-)
-
-;(test-string <comment> "%sdafadfsfsdf" )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;     INFIX     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -709,6 +719,7 @@ done)
 
 (test-string <InfixExpression> "1^2^3^4")
 (test-string <comment> ";\"\\x61;\\x63;\"")
+(test-string <symbol> "num")
 ;(test-string <SymbolChar> "1234abcd")
 ;(test-string <SymbolChar> "%33356")
 ;(test-string <symbol> "1234abcd")	
