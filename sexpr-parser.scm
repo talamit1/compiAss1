@@ -7,7 +7,7 @@
 (define <whiteSpaces>
 	(new
 		(*parser (range (integer->char 0) (integer->char 32))) 
-			*star
+			*plus
 		(*pack 
 			(lambda (_) ""))		
 	done)
@@ -478,6 +478,24 @@ done)
 	done)	
 )
 
+(define <InfixExprComment>
+	(new 
+		(*parser (word "#;"))
+		(*parser <InfixExpression>)
+		(*caten 2)
+	done)
+)
+
+(define <InfixIgnore>
+	(new
+		(*parser <whiteSpaces>)
+		(*parser <comment>)
+		(*parser <InfixExprComment>)
+		(*disj 3)
+		*plus
+	done)
+	)
+
 
 (define <InfixExtension>
 	(new
@@ -637,25 +655,13 @@ done)
 (define buildInfixOP
 	(lambda (<higherPriorityParser> <op>)
 		(new
-			(*parser <whiteSpaces>) *maybe
-			(*parser <higherPriorityParser> )
-			(*caten 2)
-			(*pack-with (lambda (w exp) exp))			
-			
-			(*parser <whiteSpaces>) *maybe
+			(*parser <higherPriorityParser> )			
 			(*parser <op>)
-			(*caten 2)
-			(*pack-with (lambda (w op) op))
-			
-			(*parser <whiteSpaces>) *maybe
-			(*parser   <higherPriorityParser> )	
-			(*parser <whiteSpaces>) *maybe
-			
-			(*caten 3)
-			(*pack-with (lambda (w1 op w2) op))
-				
+
+			(*parser   <higherPriorityParser> )					
 			(*caten 2)
 			*star
+
 			(*caten 2)
 			(*pack-with
 				(lambda (first rest)
@@ -676,24 +682,15 @@ done)
 (define buildInfixPow
 	(lambda (<higherPriorityParser> <op>)
 		(new
-			(*parser <whiteSpaces>) *maybe
-			(*parser <higherPriorityParser> )
-			(*caten 2)
-			(*pack-with (lambda (w exp) exp))			
 			
-			(*parser <whiteSpaces>) *maybe
+			(*parser <higherPriorityParser> )
+			
 			(*parser <op>)
-			(*caten 2)
-			(*pack-with (lambda (w op) op))
 			(*caten 2)
 			(*pack-with (lambda (x y) x))
 			*star
-			(*parser <whiteSpaces>) *maybe
 			(*parser   <higherPriorityParser> )	
-			(*parser <whiteSpaces>) *maybe
 			
-			(*caten 3)
-			(*pack-with (lambda (w1 op w2) op))	
 			(*caten 2)
 			(*pack-with
 				(lambda (restList lastArg)
@@ -709,6 +706,7 @@ done)
 
 (define <basicValuesParser>
 	(new
+		(*parser <InfixIgnore>) *maybe
 		(*parser <Char>)
 		(*parser <Number>)
 		(*parser <InfixSymbol>)
@@ -716,6 +714,9 @@ done)
 		(*parser <InfixSexprEscape>)
 		(*parser <InfixNeg>)
 		(*disj 6)	
+		(*parser <InfixIgnore>) *maybe
+		(*caten 3)
+		(*pack-with (lambda (ignore1 exp ignore2) exp))
 	done)	
 )
 
@@ -725,7 +726,11 @@ done)
 		(*parser <InfixArrayGet>)
 		(*parser <InfixFuncCall>)
 		(*disj 2)
+		(*parser <InfixIgnore>) *maybe
+		(*caten 2)
+		(*pack-with (lambda (expression ignore) expression))
 		*star
+
 		(*caten 2)	
 			(*pack-with
 				(lambda (first rest)
